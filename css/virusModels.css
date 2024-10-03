@@ -1,0 +1,323 @@
+/*
+  virusModels.css
+
+  ------------------------------------------------------------------------------
+  Revision History
+  ================
+  22 Mar 2020 MDS Original
+
+
+  ------------------------------------------------------------------------------
+ */
+:root {
+  --sideMargin: 15px;
+}
+
+body {
+  margin: 0;
+}
+
+select {
+  margin: 10px 10px 10px var(--sideMargin);
+  border-radius: 5px;
+}
+
+select:required:invalid {
+  color: gray;
+}
+
+option[value=""][disabled=true] {
+  display: none;
+}
+
+option {
+  color: black;
+}
+
+.container {
+  position:relative;
+}
+
+.tab {
+  margin-left: 40px; /* This is for inline elements */
+  text-indent: 40px; /* This is for block elements  */
+}
+
+#compactLink1,
+#compactLink2 {
+  font-size: 12px;
+  position: absolute;
+  left: -webkit-calc(50% - 60px);
+  left: -moz-calc(50% - 60px);
+  left: calc(50% - 60px);
+  top: 40px;
+  cursor: pointer;
+  border-radius: 5px;
+  border:1px;
+  padding: 5px;
+  font-weight: bold;
+}
+
+#compactLink1:hover,
+#compactLink2:hover {
+  background-color: black;
+  color: white;
+}
+
+.innertube {
+  height: 18px;
+}
+
+#dataInfo {
+  width: -webkit-calc(100% - 200px);
+  width: -moz-calc(100% - 200px);
+  width: calc(100% - 200px);
+}
+
+.chkOption {
+  display: inline-block;
+  width: 200px;
+  margin-bottom:5px;
+}
+
+canvas {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  border: 2px solid #de5602;
+  border-radius: 5px;
+  margin: 10px var(--sideMargin) 10px var(--sideMargin);
+}
+
+input[type='radio'] {
+  margin: 10px 10px 10px 10px
+}
+
+input[type='button'],
+button {
+  margin: 10px 10px 10px 10px;
+  border-radius: 5px;
+}
+
+input[type='checkbox'] {
+  margin: 5px 5px 5px 5px;
+  border-radius: 5px;
+  text-align: right;
+}
+
+input:not([type='button']):not([type='image']):not([type='checkbox']){
+  margin: 5px 5px 5px 5px;
+  border-radius: 5px;
+  width: 40px;
+  text-align: right;
+  padding-right: 5px; 
+}
+
+.smallButton {
+  width: 100px;
+}
+.bigButton {
+  width: 200px;
+}
+
+#EUChartZoomDiv {
+  position:relative;
+  float: right;
+  top: -25px;
+  right: -webkit-calc(var(--sideMargin) - 25px);
+  right: -moz-calc(var(--sideMargin) - 25px);
+  right: calc(var(--sideMargin) - 25px);
+}
+
+.buttonImg {
+  height: 25px;
+  width: 25px;
+}
+
+.left {
+  margin-left: var(--sideMargin);
+}
+
+.topOfPageLink  {
+  float:right;
+  margin-right: var(--sideMargin);
+  cursor: pointer;
+}
+
+.topOfPageLink  a {
+  font-size: 12px;
+  text-decoration: none;
+  color: black;
+  border-radius: 5px;
+  border:1px;
+  padding: 5px;
+  font-weight: bold;
+}
+
+.topOfPageLink a:hover {
+  background-color: black;
+  color: white;
+}
+
+h1, h2, ul, ol {
+  margin-left: var(--sideMargin);
+}
+
+h2 {
+  margin-top: 35px;
+  margin-bottom: 0px;
+}
+
+#modelStatus{
+  border-radius: 5px;
+  border: 2px solid #de5602;
+  padding-left: 5px;
+  margin-bottom: 5px;
+}
+
+#modelInputs {
+  margin: 10px var(--sideMargin) 10px var(--sideMargin);
+  border-radius: 5px;
+  border: 2px solid #de5602;
+  padding-left: 10px;
+}
+
+#modelParameterDiv {
+  padding: 0px;
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;
+}
+
+#modelFurfiesDiv div,
+#modelParameterDiv div {
+  margin: 5px;
+  height: 25px;
+}
+
+#modelFurfiesDiv div div {
+  display: inline-block;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-bottom: -5px;
+}
+
+#modelParameterDiv div div {
+  display: inline-block;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-bottom: -5px;
+}
+
+#modelParameterDiv  div div:nth-child(1) { /* Prompt */
+  text-align: right;
+  width: 300px;
+}
+
+#modelFurfiesDiv  div .tooltip,
+#modelParameterDiv div div:nth-child(2) { /* input box & tooltip */
+  width: 50px;
+margin-right: 5px;
+}
+
+#modelParameterDiv  div div:nth-child(3) { /* units */
+  text-align: left;
+  width: 180px;
+  margin-left:5px;
+  margin-bottom: -5px;
+}
+
+#modelParameterDiv  div div:nth-child(4) { /* spare for command buttons etc */
+  margin-bottom: -5px;
+}
+
+hr {
+  margin-left: 5px;
+  margin-right: 10px;
+}
+
+#modelRestartDiv {
+  display: flex;
+  flex-direction: column;
+  padding-right: 0px;
+  margin-right: 0px;
+}
+
+#modelRestartImg {
+  display:block;
+  height: 50px;
+  width: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top:0px;
+  margin-bottom: 5px;
+padding: 0px;
+}
+
+#modelRestartLbl {
+  display:block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  text-color: gray;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  max-width: 120px;
+  width: 120px;
+}
+
+#EUChartZoomDiv  .tooltip {
+  max-width: 50px;
+  width: 50px;
+}
+
+.tooltip > input {
+  float:left;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  height: 10px;
+  font-size: 80%;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 3px 0px 5px 0px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 10%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+pre {
+  font-size: 12pt;
+}
+/*
+// ----------------------------------------------------------------------------
+//                               End of file
+// ----------------------------------------------------------------------------
+*/

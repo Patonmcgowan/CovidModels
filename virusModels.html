@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en" class=" js no-mobile desktop no-ie chrome chrome80 graphics-section 2020-section world-section corona-simulator-section gradient rgba opacity textshadow multiplebgs boxshadow borderimage borderradius cssreflections csstransforms csstransitions no-touch no-retina fontface domloaded w-1065 gt-240 gt-320 gt-480 gt-640 gt-768 gt-800 gt-1024 lt-1280 lt-1440 lt-1680 lt-1920 no-portrait landscape" id="index-page">
+ <!-- 
+  virusModels.html
+
+  A client side based stochastic epidemic model to model viruses
+
+  -----------------------------------------------------------------------------
+  Revision History
+  ================
+  22 Mar 2020 MDS Original
+
+  -----------------------------------------------------------------------------
+  -->
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes,minimum-scale=1,maximum-scale=1">
+    <!-- Force browser to go to server every time -->
+    <meta http-equiv=“Pragma” content=”no-cache”>
+    <meta http-equiv=“Expires” content=”-1″>
+    <meta http-equiv=“CACHE-CONTROL” content=”NO-CACHE”>
+    <title>Covid-19 Models</title>
+    <link href="css/virusModels.css" rel="stylesheet" >
+  </head>
+
+  <body>
+  <div class="container compact" id="topOfPage">
+    <h1>Present Worldwide Covid-19 Infection Rate</h1>
+    <div id="compactLink1">COMPACT VIEW</div>
+  </div>
+  <select id="countryList" required>
+    <option disabled selected class="left">Please select a country</option>
+  </select>
+  <button type="button" onClick="EUChartObj.addCountryClick()" class="bigButton">Add Country To Chart</button>
+  <button type="button" onClick="EUChartObj.removeCountryClick()" class="bigButton">Remove Country From Chart</button>
+  <div id="EUChartDiv" style="width:calc(100% - var(--sideMargin) * 2);">
+    <canvas id="EUChartCanvas"></canvas>
+  </div>
+  <!-- -->
+    <div class="chkOption left"><input type="checkbox" id="chkShowCumData" checked></input>Cumulative Data</div>
+    <div class="chkOption"><input type="checkbox" id="chkNormaliseTimeline" checked disabled></input>Normalise Timeline</div>
+    <div class="chkOption"><input type="checkbox" id="chkNormaliseCaseData" checked></input>Normalise Case Data</div>
+    <div class="chkOption"><input type="checkbox" id="chkShowCaseData" checked></input>Show Case Data</div>
+    <div class="chkOption"><input type="checkbox" id="chkShowMortalityData" checked></input>Show Mortality Data<br /></div><br/>
+  <!-- -->
+  <div class="container compact">
+    <div class="left" id="dataInfo">
+      <label id="dataNotice"></label>.  The Covid-19 data is regularly updated; if you want to update the data locally yourself, you can follow 
+      <a href = "#howTo"> these instructions</a>.
+    </div>
+    <div id="EUChartZoomDiv">
+      <div class="tooltip">
+        <input type="image" src="img/zoomIn.png" id="EUChartZoomIn" class="buttonImg"></input>
+        <span class="tooltiptext">Zoom In</span>
+      </div>
+      <div class="tooltip">
+        <input type="image" src="img/zoomOut.png" id="EUChartZoomOut" class="buttonImg"></input>
+        <span class="tooltiptext">Zoom Out</span>
+      </div>
+      <div class="tooltip">
+        <input type="image" src="img/zoomReset.png" id="EUChartZoomReset" class="buttonImg"></input>
+        <span class="tooltiptext">Reset Zoom</span>
+      </div>
+    </div>
+  </div>
+  <div class="container compact">
+    <h1>Covid-19 Infection vs Time Models</h1>
+    <div id="compactLink2">COMPACT VIEW</div>
+  </div>
+  <div class = "left compact">
+    <p><b>About</b><br/>This webpage uses <a href="https://en.wikipedia.org/wiki/Mathematical_modelling_of_infectious_disease">
+      stochastic epidemic modeling</a> to simulate the spread of a virus through a population with time.  Specifically, it
+      implements a <a href="https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology"> SEIS and SEIR model </a>
+      with various parameters being tunable and selectable by the user.</p>
+    <p><b>The Technical Stuff</b><br />The models run in a web worker implemented on the users device (to ensure that the page continues to response
+      to the user input while the models are running). All code runs in the Javascript client without the need for a connection to 
+      a webserver, so the web worker is included as a 'blob' rather than a Javascript file on the client.<br/>
+      These models examine every member of the population every day, so will not be as responsive on a slower device<br/>
+      Written 2020 by Michael Scott.  Refer <a href = "#license">here for licence info</a> about <a href = "#codeInfo">the Javascript script files</a>.  This is an ongoing work in progress, so the 
+      page may contain bugs, as it is not intended for general distribution... bug reports and suggestions for enhancements welcome.</p>
+    <p><b>Disclaimer</b><br/>
+    These models were written as an exercise in biological modelling, may 
+    or may not represent a real world scenario, and are for demonstration purposes only.  Therefore, the results of the 
+    models should not be used to make or influence real world decisions 
+    regarding the Covid-19 virus.</p>
+  </div>
+
+
+  <div style="width:calc(100% - var(--sideMargin) * 2);" id="modelChartDiv">
+    <canvas id="modelChartCanvas"></canvas>
+  </div>
+  <!-- -->
+    <div class="chkOption left"><input type="checkbox" id="showSEIRData" checked disabled></input>Show SEIR Model</div>
+    <div class="chkOption"><input type="checkbox" id="showSEISData" disabled></input>Show SEIS Model</div>
+    <div class="chkOption"><input type="checkbox" id="modelZoomIn"></input>Zoom On Infected</div>
+  <!-- -->
+  <div class="left" id="modelStatus" style="width:calc(100% - var(--sideMargin) * 2);">Creating populations...</div>
+  <label id="modelDataNotice" class="left compact"></label>
+  <div id="modelRestartDiv">
+    <input type="image" src="img/replay.png" id = "modelRestartImg"></input>
+    <label id="modelRestartLbl">Restart Model</label>
+  </div>
+    <div id="modelInputs">
+      <div id="modelParameterDiv">
+        <b>Basic Virus Parameters</b>
+        <div> 
+          <div><i>R<sub>O</sub></i> (infection rate): </div>
+          <div class="tooltip"><input id="inpRo" value="2.5"></input><span class="tooltiptext" >Typ. 1.05 - 3.61</span></div>
+          <div> people infected on average</div>
+          <div style="float:right; padding-right:10px;">
+            Preprogrammmed values that fitted actual data<br />
+            at time of coding can be selected here:<br />
+            <select id="curveFit">
+              <option value="">Select a country's predefined variables</option>
+              <option value="Australia">Australia</option>
+              <option value="New Zealand">New Zealand</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="United States">United States</option>
+            </select><br />
+            (Note that because the model and actual data are both<br />
+            stochastic, not every model run will match the actual data)
+          </div>
+        </div>
+        <div>
+          <div>Mortality rate: </div>
+          <div class="tooltip"><input id="inpMortality" value="0.9"></input><span class="tooltiptext">Typ. 0.85% - 3.61%</span></div>
+          <div>% of infected population</div>
+          <div></div>
+        </div>
+        <div>
+          <div>Aysmptomatic Carriers: </div>
+          <div class="tooltip"><input id="inpAsymptomatic" value="2.0"></input><span class="tooltiptext">Typ. 2%</span></div>
+          <div>% of population</div>
+        </div>
+        <div>
+          <div><i>T<sub>E</sub></i> (Time: asymptomatic and not infectious): </div>
+          <div class="tooltip"><input id="inpTe" value="5"></input><span class="tooltiptext">Typ. 5 days</span></div>
+          <div>days</div>
+          <div></div>
+        </div>
+        <div>
+          <div><i>T<sub>I</sub></i> (Time: symptomatic and infectious): </div>
+          <div class="tooltip"><input id="inpTi" value="5"><span class="tooltiptext">Typ. 5 days</span></div>
+          <div>days</div>
+          <div></div>
+        </div>
+        <div>
+          <div><i>T<sub>R</sub></i> (Recovery time from infection): </div>
+          <div class="tooltip"><input id="inpTr" value="32"><span class="tooltiptext">Typ. 32 days</span></div>
+          <div>days</div>
+          <div></div>
+        </div>
+      </div>
+
+      <div><label id = "modelPrompt" placeholder="no errors"></div>
+      <hr />
+      <b>Randomisation & Customisation</b>
+      <div class="left compact">The default values below are an approximation of the historical data from NSW, Australia 
+        (eg the Ruby Princess influx on day 41 of the WHO reporting period and the start of public movement restrictions on day 51 of the WHO reporting period)</div>
+      <br/>
+
+      <div id="modelFurfiesDiv">
+        <div><input type="checkbox" id="chkStartInf" disabled checked>Start with <input id="inpStartInf" value="1"> infection(s) per 1,000,000 population</div>
+        <div><input type="checkbox" id="chkRndInfStartDay" checked>Start introducing random infections on day <input id="inpRndInfStartDay" value="24"> until day <input id="inpRndInfEndDay" value="46"> eg. simulating random infected traveller influx</div>
+        <!-- The following default values account for the Ruby Princess, which docked in Sydney on 19 March with 440 confirmed cases -->
+        <div><input type="checkbox" id="chkInfNewBatch" checked>Introduce <input id="inpInfNewBatchNum" value="18"> new infections per 1,000,000 population on day <input id="inpInfNewBatchDay" value="46"> (to simulate for example, a cruise ship docking)</div>
+        <div>
+          <div><input type="checkbox" id="chkRo1" checked>Change <i>R<sub>O</sub></i> to </div>
+          <!-- The following default values are when Australia applied limitations on gatherings etc -->
+          <div class="tooltip"><input id="inpRo1Num" value="0.30"></input><span class="tooltiptext">Typ. 0.85% - 3.61%</span></div>
+          <div>on day <input id="inpRo1Day" value="51"> (used to model start of restrictions under government emergency policies)</div>
+        </div>
+
+        <div>
+          <div class="tab"><input type="checkbox" id="chkRo2">... and then change <i>R<sub>O</sub></i> to </div>
+          <div class="tooltip"><input id="inpRo2Num" value="2.5"></input><span class="tooltiptext">Typ. 0.85% - 3.61%</span></div>
+          <div> <input id="inpRo2Day" value="42"> day(s) later (maybe restrictions are lifted)</div>
+        </div>
+
+        <div>
+          <div class="tab"><input type="checkbox" id="chkRo3">... and then change <i>R<sub>O</sub></i> to </div>
+          <div class="tooltip"><input id="inpRo3Num" value=""></input><span class="tooltiptext">Typ. 0.85% - 3.61%</span></div>
+          <div> <input id="inpRo3Day" value=""> day(s) later (maybe reimpose restrictions)</div>
+        </div>
+        <div><input type="checkbox" id="chkStartPropDay" checked>Start propagation of the infection on day <input id="inpStartPropDay" value="24"> (used to match the model with the real world data on the chart above)</div>
+        <div><input type="checkbox" id="chkModelEndDay">Stop the models on day <input value="" id="inpModelEndDay"> if nothing else above keeps them going (used to match the model with the real world data on the chart above)</div>
+      </div> <!-- modelFurfies -->
+    </div> <!-- modelInputs -->
+
+
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+    <div id="license" class="left">
+      <p><b>Software License</b><br/>
+        Copyright &copy; 2020 Michael Scott<br/><br/>
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software, including without limitation the rights
+        to use, copy, modify, merge, publish and/or distribute
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:<br/>
+        &nbsp;&nbsp;1. The original author of the Software should be acknowledged in all derivative works<br/><br/>
+        The above copyright notice and this permission notice shall be included in
+        all copies or substantial portions of the Software and derivative works from same.<br/><br/>
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+        THE SOFTWARE.
+        </p>
+    </div>
+    <div class="topOfPageLink"><a href = "#topOfPage">BACK TO TOP</a></div>
+
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+    <div id="howTo" class="left">
+      <b>How to update the JSON data</b>
+      <ol>
+        <li>Download the Excel Covid-19 Spreadsheet from <a href="https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide">the European Centre for Disease Prevention and Control</a></li>
+        <li>Open the file using a spreadsheet program and save it into csv file format (the spreadsheet is updated daily)</li>
+        <li>Convert it from CSV to JSON <a href="https://www.csvjson.com/csv2json"> with this converter </a></li>
+        <li>Paste the data into data\\COVID-19-Data.json and save the file</li>
+        <li>Refresh this webpage</li>
+      </ol>
+      <b>Alternately, use the JSON file directly:</b>
+      <ol>
+        <li>Download the Covid-19 Data as a JSON file from <a href="https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide">the European Centre for Disease Prevention and Control</a>
+            , saving it as <b><i>\data\COVID-19-Data.json</i></b></li>
+        <li>Open the file using a text editor and change line 2 from <br /><span class="tab"><b><i>"records": [</i></b></span>&nbsp;&nbsp;to<br /><span class="tab">&nbsp;&nbsp;<b><i>csvData = [</i></b></span></li>
+        <li>Refresh this webpage</li>
+      </ol>
+      Full Covid-19 daily data with best granularity (ie Australia daily stats by state) is available on this <a href = "https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports">Github repo</a>.
+    </div>
+    <div class="topOfPageLink"><a href = "#topOfPage">BACK TO TOP</a></div>
+
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+    <div id="codeInfo" class="left">
+      <b>Code Info</b><br />
+      <span id='codeInfoBlock'></span>
+    </div>
+    <div class="topOfPageLink"><a href = "#topOfPage">BACK TO TOP</a></div>
+
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+    <script src="js/utilities.js" type="text/javascript" charset="utf-8"></script> 
+    <script src="data/COVID-19-Data.json" type="text/javascript" charset="utf-8"></script> 
+    <script src="data/populationData.json" type="text/javascript" charset="utf-8"></script> 
+    <script src="js/Chart.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/virusModelWebWorker.js" type="text/javascript" charset="utf-8"></script>   
+    <script src="js/virusModelInterface.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/virusCharting.js" type="text/javascript" charset="utf-8"></script>   
+  </body>
+</html>
+<!-----------------------------------------------------------------------------
+//                               End of file
+// --------------------------------------------------------------------------->
